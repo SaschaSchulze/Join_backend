@@ -157,3 +157,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
+
+AUTHENTICATION_BACKENDS = [
+    'join.authentication.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
