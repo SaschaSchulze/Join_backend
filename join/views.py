@@ -8,6 +8,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -27,25 +30,36 @@ def register_user(request):
     return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def login_user(request):
-    email = request.data.get('email')
-    password = request.data.get('password')
+    if request.method == 'POST':
+        email = request.data.get('email')
+        password = request.data.get('password')
 
-    if not email or not password:
-        return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not email or not password:
+            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Authenticate using email as username
-    user = authenticate(username=email, password=password)
+        # Authenticate using email as username
+        user = authenticate(username=email, password=password)
 
-    if not user:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    token, created = Token.objects.get_or_create(user=user)
+        token, created = Token.objects.get_or_create(user=user)
 
-    return Response({
-        'token': token.key,
-        'user_id': user.pk,
-        'email': user.email
-    }, status=status.HTTP_200_OK)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email,
+            'username': user.username
+        }, status=status.HTTP_200_OK)
+    elif request.method == 'GET':
+        return Response({'message': 'GET request received successfully'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Method Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+@api_view(['GET'])
+def get_users(request):
+    users = User.objects.all().values('id', 'username', 'email')
+    return JsonResponse({'users': list(users)})
