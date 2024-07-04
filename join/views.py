@@ -52,7 +52,9 @@ def login_user(request):
             'token': token.key,
             'user_id': user.pk,
             'email': user.email,
-            'username': user.username
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }, status=status.HTTP_200_OK)
     elif request.method == 'GET':
         return Response({'message': 'GET request received successfully'}, status=status.HTTP_200_OK)
