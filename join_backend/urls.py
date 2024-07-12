@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from join.views import register_user, login_user, get_users
+from join.views import register_user, login_user, get_users, set_item, get_item
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/', register_user, name='register_user'),
     path('api/login/', login_user, name='login_user'),
     path('api/data/users/', get_users, name='get_users'),
+    path('api/set-item/', set_item, name='set_item'),  # Neue Route für setItem
+    path('api/get-item/', get_item, name='get_item'),  # Neue Route für getItem
 ]
